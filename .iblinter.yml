@@ -1,0 +1,7 @@
+disabled_rules:
+  - custom_class_name
+  - duplicate_constraint
+  - enable_autolayout
+  - misplaced
+  - relative_to_margin
+  - storyboard_viewcontroller_id

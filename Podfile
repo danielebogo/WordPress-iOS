@@ -48,6 +48,7 @@ target 'WordPress' do
   pod 'Starscream', '3.0.3'
   pod 'GoogleSignIn', '4.1.1'
   pod 'TTTAttributedLabel', '2.0'
+  pod 'IBLinter', :git => 'https://github.com/etoledom/IBLinter', :commit => 'f9cae2b8fde5e3fa6267d0b7ece56488021dc3e4'
 
   # --------------------
   # WordPress components
