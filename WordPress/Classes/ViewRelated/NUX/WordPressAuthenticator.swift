@@ -3,28 +3,92 @@ import CocoaLumberjack
 import NSURL_IDN
 import WordPressShared
 
-/// A collection of helper methods for NUX.
-///
-@objc class SigninHelpers: NSObject {
+
+
+// MARK: - WordPressAuthenticator Delegate Protocol
+//
+public protocol WordPressAuthenticatorDelegate: class {
+
+    /// Indicates if the Support button action should be enabled, or not.
+    ///
+    var supportActionEnabled: Bool { get }
+
+    /// Indicates if the Livechat Action should be enabled, or not.
+    ///
+    var livechatActionEnabled: Bool { get }
+
+    /// Returns the Support's Badge Count.
+    ///
+    var supportBadgeCount: Int { get }
+
+    /// Refreshes Support's Badge Count.
+    ///
+    func refreshSupportBadgeCount()
+
+    /// Presents the Support Interface from a given ViewController, with a specified SourceTag.
+    ///
+    func presentSupport(from sourceViewController: UIViewController, sourceTag: WordPressSupportSourceTag, options: [String: Any])
+
+    /// Presents the Livechat Interface, from a given ViewController, with a specified SourceTag, and additional metadata,
+    /// such as all of the User's Login details.
+    ///
+    func presentLivechat(from sourceViewController: UIViewController, sourceTag: WordPressSupportSourceTag, options: [String: Any])
+}
+
+
+// MARK: - A collection of helper methods for NUX.
+//
+@objc public class WordPressAuthenticator: NSObject {
+
+    /// Authenticator's Delegate.
+    ///
+    public weak var delegate: WordPressAuthenticatorDelegate?
+
+    /// Shared Instance.
+    ///
+    public static let shared = WordPressAuthenticator()
+
+    /// WordPress.com domain.
+    ///
     fileprivate static let WPComSuffix = ".wordpress.com"
+
+    /// Notification to be posted whenever the signing flow completes.
+    ///
     @objc static let WPSigninDidFinishNotification = "WPSigninDidFinishNotification"
 
+    /// Internal Constants.
+    ///
     fileprivate enum Constants {
         static let authenticationInfoKey = "authenticationInfoKey"
         static let jetpackBlogIDURL = "jetpackBlogIDURL"
         static let username = "username"
+        static let emailMagicLinkSource = "emailMagicLinkSource"
+    }
+
+
+    // MARK: - Public Methods
+
+    func supportBadgeCountWasUpdated() {
+        NotificationCenter.default.post(name: .wordpressSupportBadgeUpdated, object: nil)
     }
 
     // MARK: - Helpers for presenting the login flow
 
     /// Used to present the new login flow from the app delegate
     @objc class func showLoginFromPresenter(_ presenter: UIViewController, animated: Bool, thenEditor: Bool) {
+        showLoginFromPresenter(presenter, animated: animated, thenEditor: thenEditor, showCancel: false)
+    }
+
+    class func showLoginFromPresenter(_ presenter: UIViewController, animated: Bool, thenEditor: Bool, showCancel: Bool) {
         defer {
             trackOpenedLogin()
         }
 
         let storyboard = UIStoryboard(name: "Login", bundle: nil)
         if let controller = storyboard.instantiateInitialViewController() {
+            if let childController = controller.childViewControllers.first as? LoginPrologueViewController {
+                childController.showCancel = showCancel
+            }
             presenter.present(controller, animated: animated, completion: nil)
         }
     }
@@ -97,7 +161,7 @@ import WordPressShared
     }
 
     private class func trackOpenedLogin() {
-        WPAppAnalytics.track(.openedLogin)
+        WordPressAuthenticator.post(event: .openedLogin)
     }
 
 
@@ -141,13 +205,20 @@ import WordPressShared
         loginController.email = loginFields.username
         loginController.token = token
         let controller = loginController
-        WPAppAnalytics.track(.loginMagicLinkOpened)
 
-        let navController = UINavigationController(rootViewController: controller)
+        if let linkSource = loginFields.meta.emailMagicLinkSource {
+            switch linkSource {
+            case .signup:
+                WordPressAuthenticator.post(event: .signupMagicLinkOpened)
+            case .login:
+                WordPressAuthenticator.post(event: .loginMagicLinkOpened)
+            }
+        }
 
-        // The way the magic link flow works the `SigninLinkMailViewController`,
-        // or some other view controller, might still be presented when the app
-        // is resumed by tapping on the auth link.
+        let navController = LoginNavigationController(rootViewController: controller)
+
+        // The way the magic link flow works some view controller might
+        // still be presented when the app is resumed by tapping on the auth link.
         // We need to do a little work to present the SigninLinkAuth controller
         // from the right place.
         // - If the rootViewController is not presenting another vc then just
@@ -210,7 +281,7 @@ import WordPressShared
                 path = path.replacingOccurrences(of: "http://", with: "https://")
             }
         } else if isSiteURLSchemeEmpty {
-            path = "http://\(path)"
+            path = "https://\(path)"
         }
 
         path.removeSuffix("/wp-login.php")
@@ -351,6 +422,11 @@ import WordPressShared
         if let url = loginFields.meta.jetpackBlogID?.uriRepresentation().absoluteString {
             dict[Constants.jetpackBlogIDURL] = url
         }
+
+        if let linkSource = loginFields.meta.emailMagicLinkSource {
+            dict[Constants.emailMagicLinkSource] = String(linkSource.rawValue)
+        }
+
         UserDefaults.standard.set(dict, forKey: Constants.authenticationInfoKey)
     }
 
@@ -360,6 +436,7 @@ import WordPressShared
     /// - Returns: A loginFields instance or nil.
     ///
     class func retrieveLoginInfoForTokenAuth() -> LoginFields? {
+
         guard let dict = UserDefaults.standard.dictionary(forKey: Constants.authenticationInfoKey) else {
             return nil
         }
@@ -367,6 +444,11 @@ import WordPressShared
         let loginFields = LoginFields()
         if let username = dict[Constants.username] as? String {
             loginFields.username = username
+        }
+
+        if let linkSource = dict[Constants.emailMagicLinkSource] as? String,
+            let linkSourceRawValue = Int(linkSource) {
+            loginFields.meta.emailMagicLinkSource = EmailMagicLinkSource(rawValue: linkSourceRawValue)
         }
 
         let store = ContextManager.sharedInstance().persistentStoreCoordinator
@@ -396,7 +478,7 @@ import WordPressShared
     /// - Parameter loginFields: A LoginFields instance.
     ///
     @objc class func openForgotPasswordURL(_ loginFields: LoginFields) {
-        let baseURL = loginFields.meta.userIsDotCom ? "https://wordpress.com" : SigninHelpers.baseSiteURL(string: loginFields.siteAddress)
+        let baseURL = loginFields.meta.userIsDotCom ? "https://wordpress.com" : WordPressAuthenticator.baseSiteURL(string: loginFields.siteAddress)
         let forgotPasswordURL = URL(string: baseURL + "/wp-login.php?action=lostpassword&redirect_to=wordpress%3A%2F%2F")!
         UIApplication.shared.open(forgotPasswordURL)
     }
@@ -412,38 +494,24 @@ import WordPressShared
     ///
     @objc class func fetchOnePasswordCredentials(_ controller: UIViewController, sourceView: UIView, loginFields: LoginFields, success: @escaping ((_ loginFields: LoginFields) -> Void)) {
 
-        let loginURL = loginFields.meta.userIsDotCom ? "wordpress.com" : loginFields.siteAddress
+        let loginURL = loginFields.meta.userIsDotCom ? OnePasswordDefaults.dotcomURL : loginFields.siteAddress
 
-
-        let completion: OnePasswordFacadeCallback = { (username, password, oneTimePassword, error) in
-            if let error = error {
-                DDLogError("OnePassword Error: \(error.localizedDescription)")
-                WPAppAnalytics.track(.onePasswordFailed)
-                return
-            }
-
-            guard let username = username, let password = password else {
-                return
-            }
-
-            if username.isEmpty || password.isEmpty {
-                return
-            }
-
+        OnePasswordFacade().findLogin(for: loginURL, viewController: controller, sender: sourceView, success: { (username, password, otp) in
             loginFields.username = username
             loginFields.password = password
+            loginFields.multifactorCode = otp ?? String()
 
-            if let oneTimePassword = oneTimePassword {
-                loginFields.multifactorCode = oneTimePassword
+            WordPressAuthenticator.post(event: .onePasswordLogin)
+            success(loginFields)
+
+        }, failure: { error in
+            guard error != .cancelledByUser else {
+                return
             }
 
-            WPAppAnalytics.track(.onePasswordLogin)
-
-            success(loginFields)
-        }
-
-        let onePasswordFacade = OnePasswordFacade()
-        onePasswordFacade.findLogin(forURLString: loginURL, viewController: controller, sender: sourceView, completion: completion)
+            DDLogError("OnePassword Error: \(error.localizedDescription)")
+            WordPressAuthenticator.post(event: .onePasswordFailed)
+        })
     }
 
 
@@ -486,7 +554,7 @@ import WordPressShared
                 return
             }
             DispatchQueue.main.async(execute: {
-                WPAppAnalytics.track(.loginAutoFillCredentialsUpdated)
+                WordPressAuthenticator.post(event: .loginAutoFillCredentialsUpdated)
             })
         })
     }
@@ -539,7 +607,10 @@ import WordPressShared
 }
 
 
+
 extension NSNotification.Name {
-    static let WPLoginCancelled = Foundation.Notification.Name(rawValue: "WPLoginCancelled")
-    static let WPLoginFinishedJetpackLogin = Foundation.Notification.Name(rawValue: "WPLoginFinishedJetpackLogin")
+    static let wordpressLoginCancelled = Foundation.Notification.Name(rawValue: "WordPressLoginCancelled")
+    static let wordpressLoginFinishedJetpackLogin = Foundation.Notification.Name(rawValue: "WordPressLoginFinishedJetpackLogin")
+    static let wordpressAuthenticationFlowEvent = NSNotification.Name(rawValue: "WordPressAuthenticationFlowEvent")
+    static let wordpressSupportBadgeUpdated = NSNotification.Name(rawValue: "WordPressSupportBadgeUpdated")
 }

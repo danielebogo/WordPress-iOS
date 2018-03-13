@@ -13,7 +13,7 @@ class Login2FAViewController: LoginViewController, NUXKeyboardResponder, UITextF
     @IBOutlet var bottomContentConstraint: NSLayoutConstraint?
     @IBOutlet var verticalCenterConstraint: NSLayoutConstraint?
     @objc var pasteboardBeforeBackground: String? = nil
-    override var sourceTag: SupportSourceTag {
+    override var sourceTag: WordPressSupportSourceTag {
         get {
             return .login2FA
         }
@@ -49,7 +49,7 @@ class Login2FAViewController: LoginViewController, NUXKeyboardResponder, UITextF
         nc.addObserver(self, selector: #selector(applicationBecameInactive), name: .UIApplicationWillResignActive, object: nil)
         nc.addObserver(self, selector: #selector(applicationBecameActive), name: .UIApplicationDidBecomeActive, object: nil)
 
-        WPAppAnalytics.track(.loginTwoFactorFormViewed)
+        WordPressAuthenticator.post(event: .loginTwoFactorFormViewed)
     }
 
 
@@ -160,7 +160,7 @@ class Login2FAViewController: LoginViewController, NUXKeyboardResponder, UITextF
         syncWPCom(username, authToken: authToken, requiredMultifactor: true)
         // Disconnect now that we're done with Google.
         GIDSignIn.sharedInstance().disconnect()
-        WPAppAnalytics.track(.loginSocialSuccess)
+        WordPressAuthenticator.post(event: .loginSocialSuccess)
     }
 
     /// Only allow digits in the 2FA text field

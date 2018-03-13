@@ -64,6 +64,16 @@ extension WordPressAppDelegate {
 
         connectionAvailable = internetReachability.isReachable()
     }
+
+    @objc func configureWordPressAuthenticator() {
+        authManager = WordPressAuthenticationManager()
+        authTracker = WordPressAuthenticationTracker()
+
+        authTracker.startListeningToAuthenticationEvents()
+        authManager.startRelayingHelpshiftNotifications()
+
+        WordPressAuthenticator.shared.delegate = authManager
+    }
 }
 
 // MARK: - Helpers
@@ -186,7 +196,7 @@ extension WordPressAppDelegate {
             UserDefaults.standard.set(origExtraDebug, forKey: "orig_extra_debug")
             UserDefaults.standard.set(true, forKey: "extra_debug")
             WordPressAppDelegate.setLogLevel(.verbose)
-            UserDefaults.resetStandardUserDefaults()
+            UserDefaults.standard.synchronize()
         } else {
             guard let origExtraDebug = UserDefaults.standard.string(forKey: "orig_extra_debug") else {
                 return
@@ -197,7 +207,7 @@ extension WordPressAppDelegate {
             // Restore the original setting and remove orig_extra_debug
             UserDefaults.standard.set(origExtraDebugValue, forKey: "extra_debug")
             UserDefaults.standard.removeObject(forKey: "orig_extra_debug")
-            UserDefaults.resetStandardUserDefaults()
+            UserDefaults.standard.synchronize()
 
             if origExtraDebugValue {
                 WordPressAppDelegate.setLogLevel(.verbose)

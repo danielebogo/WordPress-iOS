@@ -806,7 +806,7 @@ static NSInteger HideSearchMinSites = 3;
     [self.navigationController pushViewController:self.blogDetailsViewController animated:animated];
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return [WPBlogTableViewCell cellHeight];
 }
@@ -957,7 +957,7 @@ static NSInteger HideSearchMinSites = 3;
 - (void)showLoginControllerForAddingSelfHostedSite
 {
     [self setEditing:NO animated:NO];
-    [SigninHelpers showLoginForSelfHostedSite:self];
+    [WordPressAuthenticator showLoginForSelfHostedSite:self];
 }
 
 - (void)setVisible:(BOOL)visible forBlog:(Blog *)blog

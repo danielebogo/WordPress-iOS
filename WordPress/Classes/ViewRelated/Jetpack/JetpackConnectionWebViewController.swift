@@ -201,15 +201,15 @@ private extension JetpackConnectionWebViewController {
 
     func isDotComLogin(url: URL) -> Bool {
         let dotComLoginURL = URL(string: "https://wordpress.com/log-in")!
-        return url.matchesPath(in: dotComLoginURL)
+        let dotComJetpackLoginURL = URL(string: "https://wordpress.com/log-in/jetpack")!
+        return url.matchesPath(in: dotComLoginURL) || url.matchesPath(in: dotComJetpackLoginURL)
     }
 
     func extractRedirect(url: URL) -> URL? {
         return URLComponents(url: url, resolvingAgainstBaseURL: false)?
             .queryItems?
             .first(where: { $0.name == "redirect_to" })?
-            .value?
-            .removingPercentEncoding
+            .value
             .flatMap(URL.init(string:))
     }
 
@@ -276,15 +276,15 @@ private extension JetpackConnectionWebViewController {
     func presentDotComLogin(redirect: URL) {
         pendingDotComRedirect = redirect
         startObservingLoginNotifications()
-        SigninHelpers.showLoginForJustWPComFromPresenter(self, forJetpackBlog: blog)
+        WordPressAuthenticator.showLoginForJustWPComFromPresenter(self, forJetpackBlog: blog)
     }
 
     func startObservingLoginNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(self.handleFinishedJetpackLogin), name: .WPLoginFinishedJetpackLogin, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.handleFinishedJetpackLogin), name: .wordpressLoginFinishedJetpackLogin, object: nil)
     }
 
     func stopObservingLoginNotifications() {
-        NotificationCenter.default.removeObserver(self, name: .WPLoginFinishedJetpackLogin, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .wordpressLoginFinishedJetpackLogin, object: nil)
 
     }
 

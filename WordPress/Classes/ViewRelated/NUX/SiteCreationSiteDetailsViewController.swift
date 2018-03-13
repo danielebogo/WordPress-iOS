@@ -17,8 +17,8 @@ class SiteCreationSiteDetailsViewController: NUXViewController, NUXKeyboardRespo
     @IBOutlet weak var siteTitleField: LoginTextField!
     @IBOutlet weak var taglineField: LoginTextField!
     @IBOutlet weak var tagDescriptionLabel: UILabel!
-    @IBOutlet weak var nextButton: LoginButton!
-    override var sourceTag: SupportSourceTag {
+    @IBOutlet weak var nextButton: NUXButton!
+    override var sourceTag: WordPressSupportSourceTag {
         get {
             return .wpComCreateSiteDetails
         }
@@ -75,7 +75,7 @@ class SiteCreationSiteDetailsViewController: NUXViewController, NUXKeyboardRespo
     }
 
     private func configureView() {
-        _ = addHelpButtonToNavController()
+        setupHelpButtonIfNeeded()
 
         navigationItem.title = NSLocalizedString("Create New Site", comment: "Create New Site title.")
         WPStyleGuide.configureColors(for: view, andTableView: nil)
