@@ -87,7 +87,7 @@ static NSString * const SiteDictionarySubscriptionsKey = @"subscribers_count";
 {
     NSString *path = @"read/following/mine?meta=site,feed";
     NSString *requestUrl = [self pathForEndpoint:path
-                                     withVersion:ServiceRemoteWordPressComRESTApiVersion_1_1];
+                                     withVersion:ServiceRemoteWordPressComRESTApiVersion_1_2];
 
     [self.wordPressComRestApi GET:requestUrl parameters:nil success:^(id responseObject, NSHTTPURLResponse *httpResponse) {
         if (!success) {
