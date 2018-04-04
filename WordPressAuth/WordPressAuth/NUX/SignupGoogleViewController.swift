@@ -1,5 +1,7 @@
 import GoogleSignIn
 import SVProgressHUD
+import WordPressShared
+
 
 /// View controller that handles the google signup code
 class SignupGoogleViewController: LoginViewController {
