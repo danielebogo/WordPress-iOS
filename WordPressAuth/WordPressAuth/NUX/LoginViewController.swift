@@ -1,3 +1,5 @@
+import WordPressShared
+
 /// View Controller for login-specific screens
 class LoginViewController: NUXViewController, LoginFacadeDelegate {
     @IBOutlet var instructionLabel: UILabel?

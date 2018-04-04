@@ -1,6 +1,7 @@
 import UIKit
 import SVProgressHUD
 import WordPressShared
+import WordPressKit
 import GoogleSignIn
 
 /// Provides a form and functionality for entering a two factor auth code and

@@ -1,6 +1,8 @@
 import UIKit
 import WordPressShared
 import Gridicons
+import WordPressUI
+
 
 protocol LoginWithLogoAndHelpViewController {
     func addWordPressLogoToNavController()

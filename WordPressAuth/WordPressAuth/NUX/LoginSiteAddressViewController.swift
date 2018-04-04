@@ -1,4 +1,8 @@
 import UIKit
+import WordPressShared
+import WordPressUI
+import WordPressKit
+
 
 class LoginSiteAddressViewController: LoginViewController, NUXKeyboardResponder {
     @IBOutlet weak var siteURLField: WPWalkthroughTextField!
