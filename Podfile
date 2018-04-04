@@ -67,6 +67,30 @@ target 'WordPress' do
     pod 'Nimble', '~> 7.0.3'
   end
 
+  target 'WordPressAuth' do
+    project 'WordPressAuth/WordPressAuth.xcodeproj'
+
+    # Shared
+    #
+    shared_with_networking_pods
+
+    # Automattic Dependencies
+    #
+    pod 'Gridicons', '0.15'
+
+    # 3rd Party Dependencies
+    #
+    pod 'CocoaLumberjack', '3.4.1'
+    pod 'GoogleSignIn', '4.1.2'
+    pod 'lottie-ios', '1.5.1'
+    pod 'NSURL+IDN', '0.3'
+    pod 'SVProgressHUD', '2.2.5'
+
+    target 'WordPressAuthTests' do
+      inherit! :search_paths
+    end
+  end
+
   target 'WordPressShareExtension' do
     inherit! :search_paths
 
