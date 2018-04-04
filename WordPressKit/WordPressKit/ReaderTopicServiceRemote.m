@@ -1,6 +1,7 @@
 #import "ReaderTopicServiceRemote.h"
 #import "RemoteReaderTopic.h"
 #import "RemoteReaderSiteInfo.h"
+#import "NSObject+ObjectValidation.h"
 #import <WordPressKit/WordPressKit-Swift.h>
 @import NSObject_SafeExpectations;
 @import WordPressShared;
@@ -317,14 +318,14 @@ static NSString * const DeliveryMethodNotificationKey = @"notification";
  */
 - (RemoteReaderSiteInfoSubscriptionPost *)postSubscriptionFor:(NSDictionary *)subscription
 {
-    if (subscription == nil && subscription[SubscriptionDeliveryMethodsKey] == nil) {
+    if ([subscription wp_isValidObject] && [subscription[SubscriptionDeliveryMethodsKey] wp_isValidObject]) {
         return nil;
     }
     
     NSDictionary *subscriptionDeliveryMethods = subscription[SubscriptionDeliveryMethodsKey];
     NSDictionary *deliveryMethodNotification = subscriptionDeliveryMethods[DeliveryMethodNotificationKey];
     
-    if (deliveryMethodNotification != nil) {
+    if ([deliveryMethodNotification wp_isValidObject]) {
         return [[RemoteReaderSiteInfoSubscriptionPost alloc] initWithDictionary:deliveryMethodNotification];
     }
     
@@ -340,14 +341,14 @@ static NSString * const DeliveryMethodNotificationKey = @"notification";
 
 - (RemoteReaderSiteInfoSubscriptionEmail *)emailSubscriptionFor:(NSDictionary *)subscription
 {
-    if (subscription == nil && subscription[SubscriptionDeliveryMethodsKey] == nil) {
+    if ([subscription wp_isValidObject] && [subscription[SubscriptionDeliveryMethodsKey] wp_isValidObject]) {
         return nil;
     }
     
     NSDictionary *subscriptionDeliveryMethods = subscription[SubscriptionDeliveryMethodsKey];
     NSDictionary *deliveryMethodEmail = subscriptionDeliveryMethods[DeliveryMethodEmailKey];
     
-    if (deliveryMethodEmail != nil) {
+    if ([deliveryMethodEmail wp_isValidObject]) {
         return [[RemoteReaderSiteInfoSubscriptionEmail alloc] initWithDictionary:deliveryMethodEmail];
     }
     
