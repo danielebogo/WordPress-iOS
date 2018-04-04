@@ -66,7 +66,6 @@
 		B59D1DB5207552B5002AEB31 /* EmailMagicLink.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B59D1DB3207552B5002AEB31 /* EmailMagicLink.storyboard */; };
 		B59D1DB6207552B5002AEB31 /* FancyAlertViewController+LoginError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D1DB4207552B5002AEB31 /* FancyAlertViewController+LoginError.swift */; };
 		B59D1DCA20755328002AEB31 /* NSString+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D1DB820755328002AEB31 /* NSString+Helpers.swift */; };
-		B59D1DCB20755328002AEB31 /* UIImageView+Networking.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D1DB920755328002AEB31 /* UIImageView+Networking.swift */; };
 		B59D1DCC20755328002AEB31 /* OnePasswordFacade.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D1DBA20755328002AEB31 /* OnePasswordFacade.swift */; };
 		B59D1DCD20755328002AEB31 /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D1DBB20755328002AEB31 /* AccountService.swift */; };
 		B59D1DCE20755328002AEB31 /* BlogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D1DBC20755328002AEB31 /* BlogService.swift */; };
@@ -165,7 +164,6 @@
 		B59D1DB3207552B5002AEB31 /* EmailMagicLink.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = EmailMagicLink.storyboard; sourceTree = "<group>"; };
 		B59D1DB4207552B5002AEB31 /* FancyAlertViewController+LoginError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FancyAlertViewController+LoginError.swift"; sourceTree = "<group>"; };
 		B59D1DB820755328002AEB31 /* NSString+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSString+Helpers.swift"; sourceTree = "<group>"; };
-		B59D1DB920755328002AEB31 /* UIImageView+Networking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImageView+Networking.swift"; sourceTree = "<group>"; };
 		B59D1DBA20755328002AEB31 /* OnePasswordFacade.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnePasswordFacade.swift; sourceTree = "<group>"; };
 		B59D1DBB20755328002AEB31 /* AccountService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		B59D1DBC20755328002AEB31 /* BlogService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlogService.swift; sourceTree = "<group>"; };
@@ -225,7 +223,6 @@
 			isa = PBXGroup;
 			children = (
 				B59D1DB820755328002AEB31 /* NSString+Helpers.swift */,
-				B59D1DB920755328002AEB31 /* UIImageView+Networking.swift */,
 				B59D1DBA20755328002AEB31 /* OnePasswordFacade.swift */,
 				B59D1DBB20755328002AEB31 /* AccountService.swift */,
 				B59D1DBC20755328002AEB31 /* BlogService.swift */,
@@ -680,7 +677,6 @@
 				B59D1DA5207552AE002AEB31 /* LoginSelfHostedViewController.swift in Sources */,
 				B59D1D7420755292002AEB31 /* SignupGoogleViewController.swift in Sources */,
 				B59D1DE020755592002AEB31 /* CocoaLumberjack.swift in Sources */,
-				B59D1DCB20755328002AEB31 /* UIImageView+Networking.swift in Sources */,
 				B59D1D612075527F002AEB31 /* NUXButton.swift in Sources */,
 				B59D1DAF207552AE002AEB31 /* Login2FAViewController.swift in Sources */,
 				B59D1D7E2075529B002AEB31 /* WordPressAuthenticator+Notifications.swift in Sources */,
