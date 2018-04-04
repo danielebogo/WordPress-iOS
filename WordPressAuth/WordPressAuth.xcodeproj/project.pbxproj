@@ -219,25 +219,50 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		B59D1DB720755328002AEB31 /* Stubs */ = {
+		B52686B120756240004D7056 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				B59D1DC520755328002AEB31 /* SiteInfo.swift */,
+				B59D1DC620755328002AEB31 /* WPAccount.swift */,
+				B59D1DC920755328002AEB31 /* SocialServiceName.swift */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		B5894D3E2075627700091EBC /* Other */ = {
+			isa = PBXGroup;
+			children = (
+				B59D1DBF20755328002AEB31 /* ApiCredentials.swift */,
+				B59D1DC820755328002AEB31 /* SVProgressHUD+Helpers.swift */,
+			);
+			name = Other;
+			sourceTree = "<group>";
+		};
+		B5894D3F2075628900091EBC /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
 				B59D1DB820755328002AEB31 /* NSString+Helpers.swift */,
-				B59D1DBA20755328002AEB31 /* OnePasswordFacade.swift */,
-				B59D1DBB20755328002AEB31 /* AccountService.swift */,
-				B59D1DBC20755328002AEB31 /* BlogService.swift */,
-				B59D1DBD20755328002AEB31 /* NSManagedObjectID.swift */,
-				B59D1DBE20755328002AEB31 /* BlogDetailHeaderView.swift */,
-				B59D1DBF20755328002AEB31 /* ApiCredentials.swift */,
-				B59D1DC020755328002AEB31 /* AccountSettingsService.swift */,
-				B59D1DC120755328002AEB31 /* WordPressXMLRPCAPIFacade.swift */,
-				B59D1DC320755328002AEB31 /* LoginFacade.swift */,
-				B59D1DC420755328002AEB31 /* SignupService.swift */,
-				B59D1DC520755328002AEB31 /* SiteInfo.swift */,
-				B59D1DC620755328002AEB31 /* WPAccount.swift */,
 				B59D1DC720755328002AEB31 /* UIImageView+Gravatar.swift */,
-				B59D1DC820755328002AEB31 /* SVProgressHUD+Helpers.swift */,
-				B59D1DC920755328002AEB31 /* SocialServiceName.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
+		B5894D402075629400091EBC /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				B59D1DBE20755328002AEB31 /* BlogDetailHeaderView.swift */,
+			);
+			name = UI;
+			sourceTree = "<group>";
+		};
+		B59D1DB720755328002AEB31 /* Stubs */ = {
+			isa = PBXGroup;
+			children = (
+				B5894D402075629400091EBC /* UI */,
+				B5894D3F2075628900091EBC /* Extensions */,
+				B59D1DE8207561DD002AEB31 /* Services */,
+				B52686B120756240004D7056 /* Model */,
+				B5894D3E2075627700091EBC /* Other */,
 			);
 			path = Stubs;
 			sourceTree = "<group>";
@@ -256,6 +281,21 @@
 				B59D1DE220755744002AEB31 /* String+Underline.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		B59D1DE8207561DD002AEB31 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				B59D1DBD20755328002AEB31 /* NSManagedObjectID.swift */,
+				B59D1DBB20755328002AEB31 /* AccountService.swift */,
+				B59D1DC020755328002AEB31 /* AccountSettingsService.swift */,
+				B59D1DBC20755328002AEB31 /* BlogService.swift */,
+				B59D1DC320755328002AEB31 /* LoginFacade.swift */,
+				B59D1DBA20755328002AEB31 /* OnePasswordFacade.swift */,
+				B59D1DC420755328002AEB31 /* SignupService.swift */,
+				B59D1DC120755328002AEB31 /* WordPressXMLRPCAPIFacade.swift */,
+			);
+			name = Services;
 			sourceTree = "<group>";
 		};
 		B5FB005F20754D4F007E73F7 = {
