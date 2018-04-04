@@ -27,3 +27,4 @@ FOUNDATION_EXPORT const unsigned char WordPressSharedVersionString[];
 #import <WordPressShared/WPNUXUtility.h>
 #import <WordPressShared/WPTableViewCell.h>
 #import <WordPressShared/WPTextFieldTableViewCell.h>
+#import <WordPressShared/NSObject+ObjectValidation.h>

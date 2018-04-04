@@ -1,11 +1,3 @@
-//
-//  NSObject+ObjectValidation.m
-//  WordPressKit
-//
-//  Created by Daniele Bogo on 04/04/2018.
-//  Copyright © 2018 Automattic Inc. All rights reserved.
-//
-
 #import "NSObject+ObjectValidation.h"
 
 

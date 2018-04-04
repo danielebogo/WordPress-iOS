@@ -1,11 +1,3 @@
-//
-//  RemoteReaderSiteInfoSubscription.swift
-//  WordPressKit
-//
-//  Created by Daniele Bogo on 03/04/2018.
-//  Copyright © 2018 Automattic Inc. All rights reserved.
-//
-
 import Foundation
 
 

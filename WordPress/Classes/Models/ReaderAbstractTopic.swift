@@ -14,6 +14,8 @@ import CoreData
     @NSManaged open var showInMenu: Bool
     @NSManaged open var title: String
     @NSManaged open var type: String
+    @NSManaged open var postSubscription: ReaderSiteInfoSubscriptionPost?
+    @NSManaged open var emailSubscription: ReaderSiteInfoSubscriptionEmail?
 
     @objc open class var TopicType: String {
         assert(false, "Subclasses must override")
