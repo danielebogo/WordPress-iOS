@@ -34,6 +34,15 @@ static NSString * const SiteDictionaryIDKey = @"ID";
 static NSString * const SiteDictionaryNameKey = @"name";
 static NSString * const SiteDictionaryURLKey = @"URL";
 static NSString * const SiteDictionarySubscriptionsKey = @"subscribers_count";
+static NSString * const SiteDictionarySubscriptionKey = @"subscription";
+
+// Subscription keys
+static NSString * const SubscriptionDeliveryMethodsKey = @"delivery_methods";
+
+// Delivery methods keys
+static NSString * const DeliveryMethodEmailKey = @"email";
+static NSString * const DeliveryMethodNotificationKey = @"notification";
+
 
 @implementation ReaderTopicServiceRemote
 
@@ -257,6 +266,11 @@ static NSString * const SiteDictionarySubscriptionsKey = @"subscribers_count";
     }
     NSString *endpointPath = [NSString stringWithFormat:@"read/sites/%@/posts/", siteInfo.siteID];
     siteInfo.postsEndpoint = [self endpointUrlForPath:endpointPath];
+    
+    NSDictionary *subscription = response[SiteDictionarySubscriptionKey];
+    siteInfo.postSubscription = [self postSubscriptionFor:subscription];
+    siteInfo.emailSubscription = [self emailSubscriptionFor:subscription];
+    
     return siteInfo;
 }
 
@@ -293,6 +307,52 @@ static NSString * const SiteDictionarySubscriptionsKey = @"subscribers_count";
 
 
 #pragma mark - Private Methods
+
+
+/**
+ Generate an Site Info Post Subscription object
+
+ @param subscription A dictionary object for the site subscription
+ @return A nullable Site Info Post Subscription
+ */
+- (RemoteReaderSiteInfoSubscriptionPost *)postSubscriptionFor:(NSDictionary *)subscription
+{
+    if (subscription == nil && subscription[SubscriptionDeliveryMethodsKey] == nil) {
+        return nil;
+    }
+    
+    NSDictionary *subscriptionDeliveryMethods = subscription[SubscriptionDeliveryMethodsKey];
+    NSDictionary *deliveryMethodNotification = subscriptionDeliveryMethods[DeliveryMethodNotificationKey];
+    
+    if (deliveryMethodNotification != nil) {
+        return [[RemoteReaderSiteInfoSubscriptionPost alloc] initWithDictionary:deliveryMethodNotification];
+    }
+    
+    return nil;
+}
+
+/**
+ Generate an Site Info Email Subscription object
+ 
+ @param subscription A dictionary object for the site subscription
+ @return A nullable Site Info Email Subscription
+ */
+
+- (RemoteReaderSiteInfoSubscriptionEmail *)emailSubscriptionFor:(NSDictionary *)subscription
+{
+    if (subscription == nil && subscription[SubscriptionDeliveryMethodsKey] == nil) {
+        return nil;
+    }
+    
+    NSDictionary *subscriptionDeliveryMethods = subscription[SubscriptionDeliveryMethodsKey];
+    NSDictionary *deliveryMethodEmail = subscriptionDeliveryMethods[DeliveryMethodEmailKey];
+    
+    if (deliveryMethodEmail != nil) {
+        return [[RemoteReaderSiteInfoSubscriptionEmail alloc] initWithDictionary:deliveryMethodEmail];
+    }
+    
+    return nil;
+}
 
 /**
  Formats the specified string for use as part of the URL path for the tags endpoints
