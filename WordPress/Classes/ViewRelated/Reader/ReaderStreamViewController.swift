@@ -2,6 +2,7 @@ import Foundation
 import CocoaLumberjack
 import SVProgressHUD
 import WordPressShared
+import WordPressFlux
 
 /// Displays a list of posts for a particular reader topic.
 /// - note:
@@ -692,7 +693,7 @@ import WordPressShared
     ///     - post: The post in question.
     ///     - fromView: The view to anchor a popover.
     ///
-    fileprivate func showMenuForPost(_ post: ReaderPost, fromView anchorView: UIView) {
+    fileprivate func showMenuForPost(_ post: ReaderPost, topic: ReaderSiteTopic? = nil, fromView anchorView: UIView) {
         // Create the action sheet
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alertController.addCancelActionWithTitle(ReaderPostMenuButtonTitles.cancel, handler: nil)
@@ -702,19 +703,32 @@ import WordPressShared
             alertController.addActionWithTitle(ReaderPostMenuButtonTitles.blockSite,
                 style: .destructive,
                 handler: { (action: UIAlertAction) in
-                    if let post = self.postWithObjectID(post.objectID) {
+                    if let post: ReaderPost = self.existingObjectFor(objectID: post.objectID) {
                         self.blockSiteForPost(post)
                     }
                 })
         }
 
+        // Notification
+        if let topic = topic, isLoggedIn, post.isFollowing {
+            let isSubscribedForPostNotifications = topic.isSubscribedForPostNotifications()
+            let buttonTitle = isSubscribedForPostNotifications ? ReaderPostMenuButtonTitles.unsubscribe : ReaderPostMenuButtonTitles.subscribe
+            alertController.addActionWithTitle(buttonTitle,
+                                               style: .default,
+                                               handler: { (action: UIAlertAction) in
+                                                if let topic: ReaderSiteTopic = self.existingObjectFor(objectID: topic.objectID) {
+                                                    self.toggleSubscribingNotificationsFor(topic: topic)
+                                                }
+            })
+        }
+        
         // Following
         if isLoggedIn {
             let buttonTitle = post.isFollowing ? ReaderPostMenuButtonTitles.unfollow : ReaderPostMenuButtonTitles.follow
             alertController.addActionWithTitle(buttonTitle,
                 style: .default,
                 handler: { (action: UIAlertAction) in
-                    if let post = self.postWithObjectID(post.objectID) {
+                    if let post: ReaderPost = self.existingObjectFor(objectID: post.objectID) {
                         self.toggleFollowingForPost(post)
                     }
                 })
@@ -749,7 +763,7 @@ import WordPressShared
     ///     - fromView: The view to present the sharing controller as a popover.
     ///
     fileprivate func sharePost(_ postID: NSManagedObjectID, fromView anchorView: UIView) {
-        if let post = self.postWithObjectID(postID) {
+        if let post: ReaderPost = existingObjectFor(objectID: postID) {
             let sharingController = PostSharingController()
 
             sharingController.shareReaderPost(post, fromView: anchorView, inViewController: self)
@@ -757,16 +771,20 @@ import WordPressShared
     }
 
 
-    /// Retrieves a post for the specified object ID from the display context.
+    /// Retrieves an existing object for the specified object ID from the display context.
     ///
     /// - Parameters:
     ///     - objectID: The object ID of the post.
     ///
     /// - Return: The matching post or nil if there is no match.
     ///
-    fileprivate func postWithObjectID(_ objectID: NSManagedObjectID) -> ReaderPost? {
+    fileprivate func existingObjectFor<T>(objectID: NSManagedObjectID?) -> T? {
+        guard let objectID = objectID else {
+            return nil
+        }
+        
         do {
-            return (try managedObjectContext().existingObject(with: objectID)) as? ReaderPost
+            return (try managedObjectContext().existingObject(with: objectID)) as? T
         } catch let error as NSError {
             DDLogError(error.localizedDescription)
             return nil
@@ -790,11 +808,17 @@ import WordPressShared
 
         SVProgressHUD.show()
         let postService = ReaderPostService(managedObjectContext: managedObjectContext())
+        let siteTitle = post.blogNameForDisplay()
+        let siteID = post.siteID
+        let toFollow = !post.isFollowing
         postService.toggleFollowing(for: post,
                                             success: { [weak self] in
                                                 SVProgressHUD.showDismissibleSuccess(withStatus: successMessage)
                                                 self?.syncHelper.syncContent()
                                                 self?.updateStreamHeaderIfNeeded()
+                                                if toFollow {
+                                                    self?.dispatchNoticeWith(siteTitle: siteTitle, siteID: siteID)
+                                                }
                                             },
                                             failure: { (error: Error?) in
                                                 SVProgressHUD.dismiss()
@@ -807,7 +831,29 @@ import WordPressShared
                                                 alertController.presentFromRootViewController()
                                         })
     }
+    
+    fileprivate func dispatchNoticeWith(siteTitle: String?, siteID: NSNumber?) {
+        guard let siteTitle = siteTitle, let siteID = siteID else {
+            return
+        }
+        
+        let localizedTitle = NSLocalizedString("Following %@", comment: "Text of an OK button to dismiss a prompt.")
+        let title = String(format: localizedTitle, siteTitle)
+        let message = NSLocalizedString("Enable site notifications?", comment: "Text of an OK button to dismiss a prompt.")
+        
+        let notice = Notice(title: title,
+                            message: message,
+                            feedbackType: .success,
+                            notificationInfo: nil,
+                            actionTitle: "Enable") {
+            print("Site id\(siteID.stringValue)")
+        }
+        ActionDispatcher.dispatch(NoticeAction.post(notice))
+    }
 
+    fileprivate func toggleSubscribingNotificationsFor(topic: ReaderSiteTopic) {
+        
+    }
 
     fileprivate func visitSiteForPost(_ post: ReaderPost) {
         guard
@@ -1475,9 +1521,15 @@ import WordPressShared
             generator.notificationOccurred(.success)
         }
 
+        let toFollow = !topic.following
+        let siteID = topic.siteID
+        let siteTitle = topic.blogNameToDisplay()
         let service = ReaderTopicService(managedObjectContext: topic.managedObjectContext!)
         service.toggleFollowing(forSite: topic, success: { [weak self] in
             self?.syncHelper.syncContent()
+            if toFollow {
+                self?.dispatchNoticeWith(siteTitle: siteTitle, siteID: siteID)
+            }
         }, failure: { [weak self] (error: Error?) in
             generator.notificationOccurred(.error)
             self?.updateStreamHeaderIfNeeded()
@@ -1595,8 +1647,34 @@ extension ReaderStreamViewController: ReaderPostCellDelegate {
 
 
     public func readerCell(_ cell: ReaderPostCardCell, menuActionForProvider provider: ReaderPostContentProvider, fromView sender: UIView) {
-        let post = provider as! ReaderPost
-        showMenuForPost(post, fromView: sender)
+        guard let post = provider as? ReaderPost else {
+            return
+        }
+        
+        guard post.isFollowing else {
+            showMenuForPost(post, fromView: sender)
+            return
+        }
+        
+        let service = ReaderTopicService(managedObjectContext: managedObjectContext())
+        if let topic = service.findSiteTopic(withSiteID: post.siteID) {
+            showMenuForPost(post, topic: topic, fromView: sender)
+            return
+        }
+        
+        SVProgressHUD.show()
+        service.siteTopicForSite(withID: post.siteID,
+                                 isFeed: false,
+                                 success: { [weak self] (objectID: NSManagedObjectID?, isFollowing: Bool) in
+                                    SVProgressHUD.dismiss()
+
+                                    if let topic: ReaderSiteTopic = self?.existingObjectFor(objectID: objectID),
+                                        let post: ReaderPost = self?.existingObjectFor(objectID: post.objectID){
+                                        self?.showMenuForPost(post, topic: topic, fromView: sender)
+                                    }
+        }, failure: {_ in
+            SVProgressHUD.dismiss()
+        })
     }
 
 
