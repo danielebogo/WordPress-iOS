@@ -9,6 +9,8 @@ struct ReaderPostMenuButtonTitles {
     static let visit = NSLocalizedString("Visit", comment: "An option to visit the site to which a specific post belongs")
     static let unfollow = NSLocalizedString("Unfollow Site", comment: "Verb. An option to unfollow a site.")
     static let follow = NSLocalizedString("Follow Site", comment: "Verb. An option to follow a site.")
+    static let subscribe = NSLocalizedString("Turn on site notifications", comment: "Verb. An option to switch on site notifications.")
+    static let unsubscribe = NSLocalizedString("Turn off site notifications", comment: "Verb. An option to switch off site notifications.")
 }
 
 
