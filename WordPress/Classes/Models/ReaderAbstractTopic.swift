@@ -25,6 +25,10 @@ import CoreData
     
     //MARK: - Public methods
     
+    @objc public func blogNameToDisplay() -> String {
+        return posts.first?.blogNameForDisplay() ?? title
+    }
+    
     @objc public func isSubscribedForPostNotifications() -> Bool {
         return postSubscription?.sendPosts ?? false
     }
