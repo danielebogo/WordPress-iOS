@@ -4,8 +4,6 @@ import CoreData
 @objc open class ReaderAbstractTopic: NSManagedObject {
     // Relations
     @NSManaged open var posts: [ReaderPost]
-    @NSManaged open var postSubscription: ReaderSiteInfoSubscriptionPost?
-    @NSManaged open var emailSubscription: ReaderSiteInfoSubscriptionEmail?
 
     // Properties
     @NSManaged open var inUse: Bool
@@ -20,16 +18,5 @@ import CoreData
     @objc open class var TopicType: String {
         assert(false, "Subclasses must override")
         return "abstract"
-    }
-    
-    
-    //MARK: - Public methods
-    
-    @objc public func blogNameToDisplay() -> String {
-        return posts.first?.blogNameForDisplay() ?? title
-    }
-    
-    @objc public func isSubscribedForPostNotifications() -> Bool {
-        return postSubscription?.sendPosts ?? false
     }
 }

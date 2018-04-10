@@ -511,9 +511,7 @@
         <attribute name="showInMenu" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="emailSubscription" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ReaderSiteInfoSubscriptionEmail" syncable="YES"/>
         <relationship name="posts" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ReaderPost" inverseName="topic" inverseEntity="ReaderPost" syncable="YES"/>
-        <relationship name="postSubscription" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ReaderSiteInfoSubscriptionPost" syncable="YES"/>
     </entity>
     <entity name="ReaderCrossPostMeta" representedClassName="WordPress.ReaderCrossPostMeta" syncable="YES">
         <attribute name="commentURL" optional="YES" attributeType="String" syncable="YES"/>
@@ -581,12 +579,15 @@
         <attribute name="searchPhrase" attributeType="String" indexed="YES" syncable="YES"/>
     </entity>
     <entity name="ReaderSearchTopic" representedClassName="WordPress.ReaderSearchTopic" parentEntity="ReaderAbstractTopic" syncable="YES"/>
-    <entity name="ReaderSiteInfoSubscriptionEmail" representedClassName=".ReaderSiteInfoSubscriptionEmail" parentEntity="ReaderSiteInfoSubscriptionPost" syncable="YES">
+    <entity name="ReaderSiteInfoSubscriptionEmail" representedClassName=".ReaderSiteInfoSubscriptionEmail" syncable="YES">
         <attribute name="postDeliveryFrequency" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="sendComments" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="sendPosts" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="siteTopic" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ReaderSiteTopic" inverseName="emailSubscription" inverseEntity="ReaderSiteTopic" syncable="YES"/>
     </entity>
     <entity name="ReaderSiteInfoSubscriptionPost" representedClassName=".ReaderSiteInfoSubscriptionPost" syncable="YES">
         <attribute name="sendPosts" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="siteTopic" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ReaderSiteTopic" inverseName="postSubscription" inverseEntity="ReaderSiteTopic" syncable="YES"/>
     </entity>
     <entity name="ReaderSiteTopic" representedClassName="WordPress.ReaderSiteTopic" parentEntity="ReaderAbstractTopic" syncable="YES">
         <attribute name="feedID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
@@ -600,6 +601,8 @@
         <attribute name="siteID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="siteURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="subscriberCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="emailSubscription" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ReaderSiteInfoSubscriptionEmail" inverseName="siteTopic" inverseEntity="ReaderSiteInfoSubscriptionEmail" syncable="YES"/>
+        <relationship name="postSubscription" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ReaderSiteInfoSubscriptionPost" inverseName="siteTopic" inverseEntity="ReaderSiteInfoSubscriptionPost" syncable="YES"/>
     </entity>
     <entity name="ReaderTagTopic" representedClassName="WordPress.ReaderTagTopic" parentEntity="ReaderAbstractTopic" syncable="YES">
         <attribute name="isRecommended" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
@@ -684,7 +687,7 @@
         <element name="PostType" positionX="27" positionY="153" width="128" height="105"/>
         <element name="PublicizeConnection" positionX="27" positionY="162" width="128" height="330"/>
         <element name="PublicizeService" positionX="18" positionY="153" width="128" height="195"/>
-        <element name="ReaderAbstractTopic" positionX="9" positionY="153" width="128" height="210"/>
+        <element name="ReaderAbstractTopic" positionX="9" positionY="153" width="128" height="180"/>
         <element name="ReaderCrossPostMeta" positionX="18" positionY="153" width="128" height="135"/>
         <element name="ReaderDefaultTopic" positionX="18" positionY="162" width="128" height="45"/>
         <element name="ReaderGapMarker" positionX="18" positionY="153" width="128" height="45"/>
@@ -692,9 +695,9 @@
         <element name="ReaderPost" positionX="0" positionY="0" width="128" height="660"/>
         <element name="ReaderSearchSuggestion" positionX="36" positionY="162" width="128" height="75"/>
         <element name="ReaderSearchTopic" positionX="27" positionY="153" width="128" height="45"/>
-        <element name="ReaderSiteInfoSubscriptionEmail" positionX="45" positionY="171" width="128" height="75"/>
-        <element name="ReaderSiteInfoSubscriptionPost" positionX="36" positionY="162" width="128" height="60"/>
-        <element name="ReaderSiteTopic" positionX="36" positionY="180" width="128" height="210"/>
+        <element name="ReaderSiteInfoSubscriptionEmail" positionX="45" positionY="171" width="128" height="105"/>
+        <element name="ReaderSiteInfoSubscriptionPost" positionX="36" positionY="162" width="128" height="75"/>
+        <element name="ReaderSiteTopic" positionX="36" positionY="180" width="128" height="240"/>
         <element name="ReaderTagTopic" positionX="27" positionY="171" width="128" height="90"/>
         <element name="ReaderTeamTopic" positionX="27" positionY="153" width="128" height="60"/>
         <element name="Role" positionX="36" positionY="162" width="128" height="105"/>
