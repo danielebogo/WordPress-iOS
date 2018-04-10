@@ -1,6 +1,7 @@
 #import "ReaderTopicServiceRemote.h"
 #import "RemoteReaderTopic.h"
 #import "RemoteReaderSiteInfo.h"
+#import "NSObject+ObjectValidation.h"
 #import <WordPressKit/WordPressKit-Swift.h>
 @import NSObject_SafeExpectations;
 @import WordPressShared;
