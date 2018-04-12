@@ -717,7 +717,8 @@ import WordPressFlux
                                                style: .default,
                                                handler: { (action: UIAlertAction) in
                                                 if let topic: ReaderSiteTopic = self.existingObjectFor(objectID: topic.objectID) {
-                                                    self.toggleSubscribingNotificationsFor(topic: topic)
+                                                    self.toggleSubscribingNotificationsFor(siteID: topic.siteID,
+                                                                                           subscribe: !topic.isSubscribedForPostNotifications())
                                                 }
             })
         }
@@ -845,14 +846,28 @@ import WordPressFlux
                             message: message,
                             feedbackType: .success,
                             notificationInfo: nil,
-                            actionTitle: "Enable") {
-            print("Site id\(siteID.stringValue)")
+                            actionTitle: "Enable") { [weak self] in
+                                self?.toggleSubscribingNotificationsFor(siteID: siteID, subscribe: true)
         }
         ActionDispatcher.dispatch(NoticeAction.post(notice))
     }
-
-    fileprivate func toggleSubscribingNotificationsFor(topic: ReaderSiteTopic) {
+    
+    fileprivate func toggleSubscribingNotificationsFor(siteID: NSNumber, subscribe: Bool) {
+        let service = ReaderTopicService(managedObjectContext: managedObjectContext())
         
+        let success = {
+            DDLogInfo("Success turn on notifications")
+        }
+        
+        let failure = { (error: NSError?) in
+            DDLogError("Error turn on notifications: \(error?.localizedDescription ?? "unknown error")")
+        }
+        
+        if subscribe {
+            service.subscribeSiteNotifications(with: siteID, success, failure)
+        } else {
+            service.unsubscribeSiteNotifications(with: siteID, success, failure)
+        }
     }
 
     fileprivate func visitSiteForPost(_ post: ReaderPost) {
