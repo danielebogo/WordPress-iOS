@@ -859,6 +859,7 @@ static NSString * const ReaderTopicCurrentTopicPathKey = @"ReaderTopicCurrentTop
                                                          inManagedObjectContext:self.managedObjectContext];
     }
     postSubscription.sendPosts = siteInfo.postSubscription.sendPosts;
+    postSubscription.siteTopic = topic;
     return postSubscription;
 }
 
@@ -876,6 +877,7 @@ static NSString * const ReaderTopicCurrentTopicPathKey = @"ReaderTopicCurrentTop
     emailSubscription.sendPosts = siteInfo.emailSubscription.sendPosts;
     emailSubscription.sendComments = siteInfo.emailSubscription.sendComments;
     emailSubscription.postDeliveryFrequency = siteInfo.emailSubscription.postDeliveryFrequency;
+    emailSubscription.siteTopic = topic;
     return emailSubscription;
 }
 
