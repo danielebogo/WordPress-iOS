@@ -730,6 +730,10 @@ import WordPressFlux
                 style: .default,
                 handler: { (action: UIAlertAction) in
                     if let post: ReaderPost = self.existingObjectFor(objectID: post.objectID) {
+                        if post.isFollowing {
+                            self.toggleSubscribingNotificationsFor(siteID: post.siteID, subscribe: false)
+                        }
+                        
                         self.toggleFollowingForPost(post)
                     }
                 })
@@ -812,6 +816,11 @@ import WordPressFlux
         let siteTitle = post.blogNameForDisplay()
         let siteID = post.siteID
         let toFollow = !post.isFollowing
+        
+        if !toFollow {
+            toggleSubscribingNotificationsFor(siteID: siteID, subscribe: false)
+        }
+        
         postService.toggleFollowing(for: post,
                                             success: { [weak self] in
                                                 SVProgressHUD.showDismissibleSuccess(withStatus: successMessage)
@@ -852,7 +861,11 @@ import WordPressFlux
         ActionDispatcher.dispatch(NoticeAction.post(notice))
     }
     
-    fileprivate func toggleSubscribingNotificationsFor(siteID: NSNumber, subscribe: Bool) {
+    fileprivate func toggleSubscribingNotificationsFor(siteID: NSNumber?, subscribe: Bool) {
+        guard let siteID = siteID else {
+            return
+        }
+        
         let service = ReaderTopicService(managedObjectContext: managedObjectContext())
         
         let success = {
@@ -1539,6 +1552,11 @@ import WordPressFlux
         let toFollow = !topic.following
         let siteID = topic.siteID
         let siteTitle = topic.blogNameToDisplay()
+        
+        if !toFollow {
+            toggleSubscribingNotificationsFor(siteID: siteID, subscribe: false)
+        }
+        
         let service = ReaderTopicService(managedObjectContext: topic.managedObjectContext!)
         service.toggleFollowing(forSite: topic, success: { [weak self] in
             self?.syncHelper.syncContent()

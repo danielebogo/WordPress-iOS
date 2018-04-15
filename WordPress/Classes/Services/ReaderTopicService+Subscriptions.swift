@@ -2,7 +2,66 @@ import Foundation
 import WordPressKit
 
 
-extension ReaderTopicService: ReaderTopicServiceSubscriptable {
+private enum SubscriptionAction {
+    case notifications
+    case postsEmail
+    case comments
+}
+
+extension ReaderTopicService {
+    private func apiRequest() -> WordPressComRestApi {
+        let accountService = AccountService(managedObjectContext: managedObjectContext)
+        let defaultAccount = accountService.defaultWordPressComAccount()
+        if let api = defaultAccount?.wordPressComRestApi, api.hasCredentials() {
+            return api
+        }
+        
+        return WordPressComRestApi(oAuthToken: nil, userAgent: WPUserAgent.wordPress())
+    }
+    
+    private func fetchSiteTopic(with siteId: NSNumber, _ failure: @escaping FailureBlock) -> ReaderSiteTopic? {
+        guard let siteTopic = findSiteTopic(withSiteID: siteId) else {
+            let error = NSError(domain: "ReaderTopicService", code: 0, userInfo: [NSLocalizedDescriptionKey: "No topic found"])
+            failure(error)
+            return nil
+        }
+        
+        if siteTopic.postSubscription == nil {
+            siteTopic.postSubscription = NSEntityDescription.insertNewObject(forEntityName: ReaderSiteInfoSubscriptionPost.classNameWithoutNamespaces(),
+                                                                             into: managedObjectContext) as? ReaderSiteInfoSubscriptionPost
+        }
+        
+        if siteTopic.emailSubscription == nil {
+            siteTopic.emailSubscription = NSEntityDescription.insertNewObject(forEntityName: ReaderSiteInfoSubscriptionEmail.classNameWithoutNamespaces(),
+                                                                              into: managedObjectContext) as? ReaderSiteInfoSubscriptionEmail
+        }
+        
+        ContextManager.sharedInstance().saveContextAndWait(managedObjectContext)
+        
+        return siteTopic
+    }
+    
+    private func remoteAction(for action: SubscriptionAction, siteId: NSNumber, _ subscribe: Bool, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
+        let service = ReaderTopicServiceRemote(wordPressComRestApi: apiRequest())
+        
+        switch action {
+        case .notifications:
+            if subscribe {
+                service?.subscribeSiteNotifications(with: siteId, success, failure)
+            } else {
+                service?.unsubscribeSiteNotifications(with: siteId, success, failure)
+            }
+        
+        case .postsEmail:
+            print("Email")
+            
+        case .comments:
+            print("Comments")
+        }
+    }
+}
+
+extension ReaderTopicService: SiteNotificationsSubscriptable {
     @nonobjc public func subscribeSiteNotifications(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
         toggleSiteNotifications(with: siteId, true, success, failure)
     }
@@ -15,16 +74,8 @@ extension ReaderTopicService: ReaderTopicServiceSubscriptable {
     //MARK: Private methods
     
     private func toggleSiteNotifications(with siteId: NSNumber, _ subscribe: Bool, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
-        guard let siteTopic = findSiteTopic(withSiteID: siteId) else {
-            let error = NSError(domain: "ReaderTopicService", code: 0, userInfo: [NSLocalizedDescriptionKey: "No topic found"])
-            failure(error)
+        guard let siteTopic = fetchSiteTopic(with: siteId, failure) else {
             return
-        }
-        
-        if siteTopic.postSubscription == nil {
-            siteTopic.postSubscription = NSEntityDescription.insertNewObject(forEntityName: ReaderSiteInfoSubscriptionPost.classNameWithoutNamespaces(),
-                                                                             into: managedObjectContext) as? ReaderSiteInfoSubscriptionPost
-            ContextManager.sharedInstance().saveContextAndWait(managedObjectContext)
         }
         
         let oldValue = !subscribe
@@ -45,22 +96,6 @@ extension ReaderTopicService: ReaderTopicServiceSubscriptable {
             }
         }
         
-        let service = ReaderTopicServiceRemote(wordPressComRestApi: apiRequest())
-        
-        if subscribe {
-            service?.subscribeSiteNotifications(with: siteId, successBlock, failureBlock)
-        } else {
-            service?.unsubscribeSiteNotifications(with: siteId, successBlock, failureBlock)
-        }
-    }
-    
-    private func apiRequest() -> WordPressComRestApi {
-        let accountService = AccountService(managedObjectContext: managedObjectContext)
-        let defaultAccount = accountService.defaultWordPressComAccount()
-        if let api = defaultAccount?.wordPressComRestApi, api.hasCredentials() {
-            return api
-        }
-        
-        return WordPressComRestApi(oAuthToken: nil, userAgent: WPUserAgent.wordPress())
+        remoteAction(for: .notifications, siteId: siteId, subscribe, successBlock, failureBlock)
     }
 }

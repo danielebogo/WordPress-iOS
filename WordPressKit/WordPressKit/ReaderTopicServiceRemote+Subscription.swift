@@ -1,7 +1,7 @@
 import Foundation
 
 
-extension ReaderTopicServiceRemote: ReaderTopicServiceSubscriptable {
+extension ReaderTopicServiceRemote: SiteNotificationsSubscriptable {
     @nonobjc public func subscribeSiteNotifications(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
         toggleSiteNotifications(with: siteId, true, success, failure)
     }
