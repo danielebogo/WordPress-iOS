@@ -776,27 +776,6 @@ import WordPressFlux
     }
 
 
-    /// Retrieves an existing object for the specified object ID from the display context.
-    ///
-    /// - Parameters:
-    ///     - objectID: The object ID of the post.
-    ///
-    /// - Return: The matching post or nil if there is no match.
-    ///
-    fileprivate func existingObjectFor<T>(objectID: NSManagedObjectID?) -> T? {
-        guard let objectID = objectID else {
-            return nil
-        }
-        
-        do {
-            return (try managedObjectContext().existingObject(with: objectID)) as? T
-        } catch let error as NSError {
-            DDLogError(error.localizedDescription)
-            return nil
-        }
-    }
-
-
     fileprivate func toggleFollowingForPost(_ post: ReaderPost) {
         var errorMessage: String
         var errorTitle: String

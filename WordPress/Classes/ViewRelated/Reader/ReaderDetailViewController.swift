@@ -3,8 +3,7 @@ import CocoaLumberjack
 import WordPressShared
 import QuartzCore
 
-open class ReaderDetailViewController: UIViewController, UIViewControllerRestoration {
-
+open class ReaderDetailViewController: UIViewController, UIViewControllerRestoration, Subscriptable {
     @objc static let restorablePostObjectURLhKey: String = "RestorablePostObjectURLKey"
 
     // Structs for Constants
@@ -98,6 +97,10 @@ open class ReaderDetailViewController: UIViewController, UIViewControllerRestora
     }
 
 
+    func managedObjectContext() -> NSManagedObjectContext {
+        return ContextManager.sharedInstance().mainContext
+    }
+    
     // MARK: - Convenience Factories
 
 
@@ -1003,11 +1006,11 @@ open class ReaderDetailViewController: UIViewController, UIViewControllerRestora
                                  isFeed: false,
                                  success: { [weak self] (objectID: NSManagedObjectID?, isFollowing: Bool) in
                                     SVProgressHUD.dismiss()
-                                    
-//                                    if let topic: ReaderSiteTopic = self?.existingObjectFor(objectID: objectID),
-//                                        let post: ReaderPost = self?.existingObjectFor(objectID: post.objectID){
-//                                        ReaderPostMenu.showMenuForPost(post, topic: topic, fromView: menuButton, inViewController: self?)
-//                                    }
+                                    if let topic: ReaderSiteTopic = self?.existingObjectFor(objectID: objectID),
+                                        let post: ReaderPost = self?.existingObjectFor(objectID: post.objectID),
+                                        let menuButton = self?.menuButton {
+                                        ReaderPostMenu.showMenuForPost(post, topic: topic, fromView: menuButton, inViewController: self)
+                                    }
             }, failure: {_ in
                 SVProgressHUD.dismiss()
         })
