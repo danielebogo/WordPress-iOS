@@ -17,7 +17,11 @@ struct ReaderPostMenuButtonTitles {
 open class ReaderPostMenu {
     open static let BlockSiteNotification = "ReaderPostMenuBlockSiteNotification"
 
-    open class func showMenuForPost(_ post: ReaderPost, fromView anchorView: UIView, inViewController viewController: UIViewController) {
+    open class func showMenuForPost(_ post: ReaderPost, topic: ReaderSiteTopic? = nil, fromView anchorView: UIView, inViewController viewController: UIViewController?) {
+        guard let viewController = viewController else {
+            return
+        }
+        
         // Create the action sheet
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alertController.addCancelActionWithTitle(ReaderPostMenuButtonTitles.cancel, handler: nil)
