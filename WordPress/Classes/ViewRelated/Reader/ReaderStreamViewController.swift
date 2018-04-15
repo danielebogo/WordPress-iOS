@@ -798,20 +798,16 @@ import WordPressFlux
 
 
     fileprivate func toggleFollowingForPost(_ post: ReaderPost) {
-        var successMessage: String
         var errorMessage: String
         var errorTitle: String
         if post.isFollowing {
-            successMessage = NSLocalizedString("Unfollowed site", comment: "Short confirmation that unfollowing a site was successful")
             errorTitle = NSLocalizedString("Problem Unfollowing Site", comment: "Title of a prompt")
             errorMessage = NSLocalizedString("There was a problem unfollowing the site. If the problem persists you can contact us via the Me > Help & Support screen.", comment: "Short notice that there was a problem unfollowing a site and instructions on how to notify us of the problem.")
         } else {
-            successMessage = NSLocalizedString("Followed site", comment: "Short confirmation that unfollowing a site was successful")
             errorTitle = NSLocalizedString("Problem Following Site", comment: "Title of a prompt")
             errorMessage = NSLocalizedString("There was a problem following the site.  If the problem persists you can contact us via the Me > Help & Support screen.", comment: "Short notice that there was a problem following a site and instructions on how to notify us of the problem.")
         }
 
-        SVProgressHUD.show()
         let postService = ReaderPostService(managedObjectContext: managedObjectContext())
         let siteTitle = post.blogNameForDisplay()
         let siteID = post.siteID
@@ -823,7 +819,6 @@ import WordPressFlux
         
         postService.toggleFollowing(for: post,
                                             success: { [weak self] in
-                                                SVProgressHUD.showDismissibleSuccess(withStatus: successMessage)
                                                 self?.syncHelper.syncContent()
                                                 self?.updateStreamHeaderIfNeeded()
                                                 if toFollow {
@@ -831,8 +826,6 @@ import WordPressFlux
                                                 }
                                             },
                                             failure: { (error: Error?) in
-                                                SVProgressHUD.dismiss()
-
                                                 let cancelTitle = NSLocalizedString("OK", comment: "Text of an OK button to dismiss a prompt.")
                                                 let alertController = UIAlertController(title: errorTitle,
                                                     message: errorMessage,
