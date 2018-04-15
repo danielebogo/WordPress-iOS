@@ -2,7 +2,6 @@ import Foundation
 import WordPressFlux
 
 
-
 /// Subscriptable is the protocol to extend
 /// all the functionalities for site notifications subscriptions
 protocol Subscriptable {
@@ -11,6 +10,7 @@ protocol Subscriptable {
     /// - Returns: A valid managed object context
     func managedObjectContext() -> NSManagedObjectContext
 }
+
 
 extension Subscriptable {
     /// Retrieves an existing object for the specified object ID from the display context.
@@ -33,6 +33,7 @@ extension Subscriptable {
         }
     }
 }
+
 
 extension Subscriptable where Self: UIViewController {
     /// Dispatch a Notice
@@ -59,7 +60,6 @@ extension Subscriptable where Self: UIViewController {
         }
         ActionDispatcher.dispatch(NoticeAction.post(notice))
     }
-    
     
     /// Toggle subscription action for site notifications
     ///
