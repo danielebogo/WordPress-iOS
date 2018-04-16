@@ -9,10 +9,10 @@ extension ReaderTopicServiceRemote {
             return
         }
         
-        DDLogInfo("URL: \(urlRequest)")
+        DDLogInfo("➡️➡️➡️ URL: \(urlRequest)")
         
-        wordPressComRestApi.POST(urlRequest, parameters: parameters, success: { (_, _) in
-            DDLogInfo("Success")
+        wordPressComRestApi.POST(urlRequest, parameters: parameters, success: { (_, response) in
+            DDLogInfo("➡️ Success \(response?.url?.absoluteString ?? "unknown response url")")
             success()
         }) { (error, _) in
             DDLogError("error: \(error.localizedDescription)")
@@ -45,15 +45,15 @@ extension ReaderTopicServiceRemote: SiteCommentsSubscriptable {
 
 
 extension ReaderTopicServiceRemote: SitePostsSubscriptable {
-    @nonobjc public func subscribePostEmail(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
+    @nonobjc public func subscribePostsEmail(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
         POST(with: .postsEmail(siteId: siteId, action: .subscribe), success: success, failure: failure)
     }
     
-    @nonobjc public func unsubscribePostEmail(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
+    @nonobjc public func unsubscribePostsEmail(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
         POST(with: .postsEmail(siteId: siteId, action: .unsubscribe), success: success, failure: failure)
     }
     
-    @nonobjc public func updateFrequencyPostEmail(with siteId: NSNumber, frequency: ReaderServiceDeliveryFrequency, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
+    @nonobjc public func updateFrequencyPostsEmail(with siteId: NSNumber, frequency: ReaderServiceDeliveryFrequency, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
         let parameters = [WordPressKitConstants.SiteSubscription.Delivery.frequency: NSString(string: frequency.rawValue)]
         POST(with: .postsEmail(siteId: siteId, action: .update), parameters: parameters, success: success, failure: failure)
     }
