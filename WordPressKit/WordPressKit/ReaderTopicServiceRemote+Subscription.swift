@@ -34,11 +34,11 @@ extension ReaderTopicServiceRemote: SiteNotificationsSubscriptable {
 
 
 extension ReaderTopicServiceRemote: SiteCommentsSubscriptable {
-    @nonobjc public func subscribeSiteComment(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
+    @nonobjc public func subscribeSiteComments(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
         POST(with: .comments(siteId: siteId, action: .subscribe), success: success, failure: failure)
     }
     
-    @nonobjc public func unsubscribeSiteComment(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
+    @nonobjc public func unsubscribeSiteComments(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
         POST(with: .comments(siteId: siteId, action: .unsubscribe), success: success, failure: failure)
     }
 }

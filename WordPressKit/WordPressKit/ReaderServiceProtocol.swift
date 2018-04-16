@@ -21,6 +21,6 @@ public protocol SitePostsSubscriptable: ReaderServiceSubscriptable {
 
 
 public protocol SiteCommentsSubscriptable: ReaderServiceSubscriptable {
-    func subscribeSiteComment(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock)
-    func unsubscribeSiteComment(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock)
+    func subscribeSiteComments(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock)
+    func unsubscribeSiteComments(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock)
 }
