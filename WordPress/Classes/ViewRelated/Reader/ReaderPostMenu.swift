@@ -59,10 +59,6 @@ open class ReaderPostMenu {
             style: .default,
             handler: { (action: UIAlertAction) in
                 if let post: ReaderPost = viewController.existingObjectFor(objectID: post.objectID) {
-                    if post.isFollowing {
-                        viewController.toggleSubscribingNotificationsFor(siteID: post.siteID, subscribe: false)
-                    }
-                    
                     self.toggleFollowingForPost(post, viewController)
                 }
         })
@@ -134,6 +130,10 @@ open class ReaderPostMenu {
         let siteTitle = post.blogNameForDisplay()
         let siteID = post.siteID
         let toFollow = !post.isFollowing
+        
+        if !toFollow {
+            viewController.toggleSubscribingNotificationsFor(siteID: siteID, subscribe: false)
+        }
         
         let postService = ReaderPostService(managedObjectContext: post.managedObjectContext!)
         postService.toggleFollowing(for: post, success: { () in

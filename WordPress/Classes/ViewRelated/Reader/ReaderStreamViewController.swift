@@ -730,10 +730,6 @@ import WordPressFlux
                 style: .default,
                 handler: { (action: UIAlertAction) in
                     if let post: ReaderPost = self.existingObjectFor(objectID: post.objectID) {
-                        if post.isFollowing {
-                            self.toggleSubscribingNotificationsFor(siteID: post.siteID, subscribe: false)
-                        }
-                        
                         self.toggleFollowingForPost(post)
                     }
                 })

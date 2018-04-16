@@ -74,7 +74,7 @@ extension Subscriptable where Self: UIViewController {
         let service = ReaderTopicService(managedObjectContext: managedObjectContext())
         
         let success = {
-            DDLogInfo("Success turn on notifications")
+            DDLogInfo("Success turn notifications \(subscribe ? "on" : "off")")
         }
         
         let failure = { (error: NSError?) in

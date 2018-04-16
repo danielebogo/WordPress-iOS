@@ -3,9 +3,9 @@ import WordPressKit
 
 
 private enum SubscriptionAction {
-    case notifications
-    case postsEmail
-    case comments
+    case notifications(siteId: NSNumber)
+    case postsEmail(siteId: NSNumber)
+    case comments(siteId: NSNumber)
 }
 
 extension ReaderTopicService {
@@ -41,7 +41,7 @@ extension ReaderTopicService {
         return siteTopic
     }
     
-    private func remoteAction(for action: SubscriptionAction, siteId: NSNumber, _ subscribe: Bool, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
+    private func remoteAction(for action: SubscriptionAction, _ subscribe: Bool, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
         let service = ReaderTopicServiceRemote(wordPressComRestApi: apiRequest())
         
         let successBlock: SuccessBlock = {
@@ -49,7 +49,7 @@ extension ReaderTopicService {
         }
         
         switch action {
-        case .notifications:
+        case .notifications(let siteId):
             if subscribe {
                 service?.subscribeSiteNotifications(with: siteId, successBlock, failure)
             } else {
@@ -64,6 +64,7 @@ extension ReaderTopicService {
         }
     }
 }
+
 
 extension ReaderTopicService: SiteNotificationsSubscriptable {
     @nonobjc public func subscribeSiteNotifications(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
@@ -96,6 +97,17 @@ extension ReaderTopicService: SiteNotificationsSubscriptable {
             }
         }
         
-        remoteAction(for: .notifications, siteId: siteId, subscribe, success, failureBlock)
+        remoteAction(for: .notifications(siteId: siteId), subscribe, success, failureBlock)
+    }
+}
+
+
+extension ReaderTopicService: SiteCommentsSubscriptable {
+    @nonobjc public func subscribeSiteComments(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
+        
+    }
+    
+    @nonobjc public func unsubscribeSiteComments(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
+        
     }
 }
