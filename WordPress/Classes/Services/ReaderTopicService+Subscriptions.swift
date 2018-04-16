@@ -44,12 +44,16 @@ extension ReaderTopicService {
     private func remoteAction(for action: SubscriptionAction, siteId: NSNumber, _ subscribe: Bool, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock) {
         let service = ReaderTopicServiceRemote(wordPressComRestApi: apiRequest())
         
+        let successBlock: SuccessBlock = {
+            ContextManager.sharedInstance().save(self.managedObjectContext, withCompletionBlock: success)
+        }
+        
         switch action {
         case .notifications:
             if subscribe {
-                service?.subscribeSiteNotifications(with: siteId, success, failure)
+                service?.subscribeSiteNotifications(with: siteId, successBlock, failure)
             } else {
-                service?.unsubscribeSiteNotifications(with: siteId, success, failure)
+                service?.unsubscribeSiteNotifications(with: siteId, successBlock, failure)
             }
         
         case .postsEmail:
@@ -81,10 +85,6 @@ extension ReaderTopicService: SiteNotificationsSubscriptable {
         let oldValue = !subscribe
         siteTopic.postSubscription?.sendPosts = subscribe
         
-        let successBlock: SuccessBlock = {
-            ContextManager.sharedInstance().save(self.managedObjectContext, withCompletionBlock: success)
-        }
-        
         let failureBlock: FailureBlock = { (error: NSError?) in
             guard let siteTopic = self.findSiteTopic(withSiteID: siteId) else {
                 failure(nil)
@@ -96,6 +96,6 @@ extension ReaderTopicService: SiteNotificationsSubscriptable {
             }
         }
         
-        remoteAction(for: .notifications, siteId: siteId, subscribe, successBlock, failureBlock)
+        remoteAction(for: .notifications, siteId: siteId, subscribe, success, failureBlock)
     }
 }

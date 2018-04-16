@@ -16,7 +16,7 @@ public protocol SiteNotificationsSubscriptable: ReaderServiceSubscriptable {
 public protocol SitePostsSubscriptable: ReaderServiceSubscriptable {
     func subscribePostEmail(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock)
     func unsubscribePostEmail(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock)
-    func updateFrequencyPostEmail(with siteId: NSNumber, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock)
+    func updateFrequencyPostEmail(with siteId: NSNumber, frequency: ReaderServiceDeliveryFrequency, _ success: @escaping SuccessBlock, _ failure: @escaping FailureBlock)
 }
 
 
